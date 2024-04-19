@@ -43,10 +43,10 @@ class RenamifyApp(tk.Tk):
 
         optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys())
         optmen_mode.grid(row=4, column=1, padx=10, pady=10)
-        self.var_mode.trace_add("write", self.show_hide_options)  # Call a method to show/hide options based on var_mode
+        self.var_mode.trace_add("write", self.mode_changed)  # Call a method to show/hide options based on var_mode
 
-        lbl_new_name = tk.Label(self, text="Your Name:")
-        lbl_new_name.grid(row=5, column=0, padx=10, pady=10)
+        self.lbl_new_name = tk.Label(self, text="New Prefix")
+        self.lbl_new_name.grid(row=5, column=0, padx=10, pady=10)
 
         ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
         ent_new_name.grid(row=5, column=1, sticky="ew", padx=10, pady=0)
@@ -63,9 +63,19 @@ class RenamifyApp(tk.Tk):
         # Widget is hidden unless in "replace" / "suffix" mode
         self.chk_replace_extension = tk.Checkbutton(self, text="Replace Extension", variable=self.var_replace_extension)
 
-    def show_hide_options(self, *args):
-        # Show / Hide the checkboxes if mode is "replace" / "suffix"
+    def mode_changed(self, *args):
         mode = self.mode_options[self.var_mode.get()]
+        if mode == "prefix":
+            self.lbl_new_name.config(text="New Prefix:")
+        elif mode == "suffix":
+            self.lbl_new_name.config(text="New Suffix:")
+        elif mode == "replace":
+            self.lbl_new_name.config(text="New Name:")
+        
+        self.show_hide_options(mode)
+
+    def show_hide_options(self, mode):
+        # Show / Hide the checkboxes if mode is "replace" / "suffix"
         if mode == "replace" or mode == "suffix":
             self.chk_replace_extension.grid(row=8, column=1, padx=10, sticky="e")
         else:
