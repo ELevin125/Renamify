@@ -103,7 +103,7 @@ class RenamifyApp(tk.Tk):
         return self.var_new_name.get() + filename
 
     def add_suffix(self, filename):
-        pass
+        return filename + self.var_new_name.get()
 
     def replace_whole(self, filename):
         pass
