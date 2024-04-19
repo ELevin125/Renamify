@@ -18,6 +18,7 @@ class RenamifyApp(tk.Tk):
         self.var_folder_path = tk.StringVar(value="C:/Your Path")
         self.var_mode = tk.StringVar(value="Add Prefix")
         self.var_new_name = tk.StringVar(value="New Name")
+        self.var_include_subfolders = tk.BooleanVar(value=True)
 
         self.create_widgets()
 
@@ -27,8 +28,8 @@ class RenamifyApp(tk.Tk):
         lbl_select_folder = tk.Label(self, text="Select Folder:")
         lbl_select_folder.grid(row=0, column=0, padx=10, pady=10)
 
-        self.ent_folder_path = tk.Entry(self, textvariable=self.var_folder_path, state="disabled")
-        self.ent_folder_path.grid(row=1, columnspan=2, column=0, sticky="ew", padx=10, pady=0)
+        ent_folder_path = tk.Entry(self, textvariable=self.var_folder_path, state="disabled")
+        ent_folder_path.grid(row=1, columnspan=2, column=0, sticky="ew", padx=10, pady=0)
 
         btn_browse_folder = tk.Button(self, text="Browse", command=self.select_folder)
         btn_browse_folder.grid(row=0, column=1, padx=10, pady=10)
@@ -37,20 +38,24 @@ class RenamifyApp(tk.Tk):
 
         # Options for renaming
         lbl_mode = tk.Label(self, text="Rename Mode:")
-        lbl_mode.grid(row=3, column=0, padx=10, pady=10)
+        lbl_mode.grid(row=4, column=0, padx=10, pady=10)
 
-        self.optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys())
-        self.optmen_mode.grid(row=3, column=1, padx=10, pady=10)
+        optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys())
+        optmen_mode.grid(row=4, column=1, padx=10, pady=10)
 
         lbl_new_name = tk.Label(self, text="Your Name:")
-        lbl_new_name.grid(row=4, column=0, padx=10, pady=10)
+        lbl_new_name.grid(row=5, column=0, padx=10, pady=10)
 
-        self.ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
-        self.ent_new_name.grid(row=4, column=1, sticky="ew", padx=10, pady=0)
+        ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
+        ent_new_name.grid(row=5, column=1, sticky="ew", padx=10, pady=0)
 
         # Rename button
         btn_rename = tk.Button(self, text="Rename Files", command=self.rename_files)
-        btn_rename.grid(row=5, columnspan=2, pady=20)
+        btn_rename.grid(row=6, columnspan=2, pady=20)
+
+        # Checkbox for subfolders
+        chk_include_subfolders = tk.Checkbutton(self, text="Include Subfolders", variable=self.var_include_subfolders)
+        chk_include_subfolders.grid(row=7, column=1, padx=10, sticky="e")
 
     def select_folder(self):
         folder_selected = filedialog.askdirectory()
@@ -58,10 +63,29 @@ class RenamifyApp(tk.Tk):
 
     def rename_files(self):
         folder_path = self.var_folder_path.get()
-        for filename in os.listdir(folder_path):
-            if os.path.isfile(os.path.join(folder_path, filename)):
-                new_filename = self.get_new_name(filename)
-                os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+
+        target_files = self.get_target_files(folder_path, self.var_include_subfolders.get())
+        for old_file_path in target_files:
+            new_filename = self.get_new_name(os.path.basename(old_file_path))
+            new_file_path = os.path.join(os.path.dirname(old_file_path), new_filename)
+            os.rename(old_file_path, new_file_path)
+
+    def get_target_files(self, folder_path, include_subfolders=False):
+        target_files = []
+        if include_subfolders:
+            # walk only includes files, so no need to check if it is a file
+            for root, _, files in os.walk(folder_path):
+                for filename in files:
+                    file_path = os.path.join(root, filename)
+                    target_files.append(file_path)
+        else:
+            for filename in os.listdir(folder_path):
+                file_path = os.path.join(folder_path, filename) 
+                if os.path.isfile(file_path):
+                    target_files.append(file_path)
+                    
+        return target_files
+
 
 
     def get_new_name(self, filename):
