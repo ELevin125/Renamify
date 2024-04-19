@@ -57,30 +57,30 @@ class RenamifyApp(tk.Tk):
         self.var_folder_path.set(folder_selected)
 
     def rename_files(self):
+        folder_path = self.var_folder_path.get()
+        for filename in os.listdir(folder_path):
+            if os.path.isfile(os.path.join(folder_path, filename)):
+                new_filename = self.get_new_name(filename)
+                os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+
+
+    def get_new_name(self, filename):
         var_mode = self.mode_options[self.var_mode.get()]
         if var_mode == "prefix":
-            self.add_prefix()
+            return self.add_prefix(filename)
         elif var_mode == "suffix":
-            self.add_suffix()
+            return self.add_suffix(filename)
         elif var_mode == "replace":
-            self.replace_whole()
-    
-    def add_prefix(self):
-        folder_path = self.var_folder_path.get()
-        prefix = self.var_new_name.get()
-        if folder_path and prefix:
-            for filename in os.listdir(folder_path):
-                if os.path.isfile(os.path.join(folder_path, filename)):
-                    new_filename = prefix + filename
-                    os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
-            # Update the entry with the new folder path after renaming
-            self.var_folder_path.set(folder_path)
-        else:
-            print("Folder path and prefix are required.")
+            return self.replace_whole(filename)
 
-    def add_suffix(self):
+        return filename
+    
+    def add_prefix(self, filename):
+        return self.var_new_name.get() + filename
+
+    def add_suffix(self, filename):
         pass
 
-    def replace_whole(self):
+    def replace_whole(self, filename):
         pass
 
