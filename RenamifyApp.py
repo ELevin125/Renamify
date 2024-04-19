@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 
 class RenamifyApp(tk.Tk):
     def __init__(self):
@@ -37,7 +38,7 @@ class RenamifyApp(tk.Tk):
         lbl_mode = tk.Label(self, text="Rename Mode:")
         lbl_mode.grid(row=3, column=0, padx=10, pady=10)
 
-        self.optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys(), command=self.update_mode)
+        self.optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys())
         self.optmen_mode.grid(row=3, column=1, padx=10, pady=10)
 
         lbl_new_name = tk.Label(self, text="New Name:")
@@ -51,11 +52,9 @@ class RenamifyApp(tk.Tk):
         btn_rename.grid(row=5, columnspan=2, pady=20)
 
     def select_folder(self):
-        pass
+        folder_selected = filedialog.askdirectory()
+        self.var_folder_path.set(folder_selected)
 
     def rename_files(self):
         pass
 
-    def update_mode(self, *args):
-        mode = self.mode_options[self.var_mode.get()]
-        print("Selected mode:", mode)
