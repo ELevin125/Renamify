@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import os
 
 class RenamifyApp(tk.Tk):
     def __init__(self):
@@ -14,7 +15,7 @@ class RenamifyApp(tk.Tk):
         }
         
         # Variables
-        self.var_folder_path = tk.StringVar()
+        self.var_folder_path = tk.StringVar(value="C:/Your Path")
         self.var_mode = tk.StringVar(value="Add Prefix")
         self.var_new_name = tk.StringVar(value="New Name")
 
@@ -41,7 +42,7 @@ class RenamifyApp(tk.Tk):
         self.optmen_mode = tk.OptionMenu(self, self.var_mode, *self.mode_options.keys())
         self.optmen_mode.grid(row=3, column=1, padx=10, pady=10)
 
-        lbl_new_name = tk.Label(self, text="New Name:")
+        lbl_new_name = tk.Label(self, text="Your Name:")
         lbl_new_name.grid(row=4, column=0, padx=10, pady=10)
 
         self.ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
@@ -56,5 +57,30 @@ class RenamifyApp(tk.Tk):
         self.var_folder_path.set(folder_selected)
 
     def rename_files(self):
+        var_mode = self.mode_options[self.var_mode.get()]
+        if var_mode == "prefix":
+            self.add_prefix()
+        elif var_mode == "suffix":
+            self.add_suffix()
+        elif var_mode == "replace":
+            self.replace_whole()
+    
+    def add_prefix(self):
+        folder_path = self.var_folder_path.get()
+        prefix = self.var_new_name.get()
+        if folder_path and prefix:
+            for filename in os.listdir(folder_path):
+                if os.path.isfile(os.path.join(folder_path, filename)):
+                    new_filename = prefix + filename
+                    os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+            # Update the entry with the new folder path after renaming
+            self.var_folder_path.set(folder_path)
+        else:
+            print("Folder path and prefix are required.")
+
+    def add_suffix(self):
+        pass
+
+    def replace_whole(self):
         pass
 
