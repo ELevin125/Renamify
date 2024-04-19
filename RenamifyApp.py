@@ -65,8 +65,8 @@ class RenamifyApp(tk.Tk):
         folder_path = self.var_folder_path.get()
 
         target_files = self.get_target_files(folder_path, self.var_include_subfolders.get())
-        for old_file_path in target_files:
-            new_filename = self.get_new_name(os.path.basename(old_file_path))
+        for index, old_file_path in enumerate(target_files):
+            new_filename = self.get_new_name(os.path.basename(old_file_path), index)
             new_file_path = os.path.join(os.path.dirname(old_file_path), new_filename)
             os.rename(old_file_path, new_file_path)
 
@@ -88,14 +88,14 @@ class RenamifyApp(tk.Tk):
 
 
 
-    def get_new_name(self, filename):
+    def get_new_name(self, filename, index):
         var_mode = self.mode_options[self.var_mode.get()]
         if var_mode == "prefix":
             return self.add_prefix(filename)
         elif var_mode == "suffix":
             return self.add_suffix(filename)
         elif var_mode == "replace":
-            return self.replace_whole(filename)
+            return self.replace_whole(f" ({index})")
 
         return filename
     
@@ -105,6 +105,6 @@ class RenamifyApp(tk.Tk):
     def add_suffix(self, filename):
         return filename + self.var_new_name.get()
 
-    def replace_whole(self, filename):
-        pass
+    def replace_whole(self, suffix=""):
+        return self.var_new_name.get() + str(suffix)
 
