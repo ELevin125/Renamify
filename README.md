@@ -18,9 +18,5 @@ Renamify is a Python application that allows you to rename files in bulk. Whethe
 
 1. Select the folder containing the files you want to rename by clicking the "Browse" button.
 2. Choose the desired renaming mode from the dropdown menu:
-   - **Add Prefix:** Enter the prefix in the provided field.
-   - **Add Suffix:** Enter the suffix in the provided field.
-   - **Replace:** Enter the new name in the provided field.
-   - **Replace Match:** Enter the text to match and its replacement in the provided fields.
-3. Add new name / change.
+3. Add new / edit name.
 4. Click the "Rename Files" button to apply the changes.
