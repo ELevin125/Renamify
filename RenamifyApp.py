@@ -11,13 +11,15 @@ class RenamifyApp(tk.Tk):
         self.mode_options = {
             "Add Prefix": "prefix",
             "Add Suffix": "suffix",
-            "Replace": "replace"
+            "Replace": "replace",
+            "Replace Match": "match"
         }
         
         # Variables
         self.var_folder_path = tk.StringVar(value="C:/Your Path")
         self.var_mode = tk.StringVar(value="Add Prefix")
         self.var_new_name = tk.StringVar(value="New Name")
+        self.var_to_match = tk.StringVar()
         self.var_include_subfolders = tk.BooleanVar(value=True)
         self.var_replace_extension = tk.BooleanVar(value=False)
 
@@ -48,16 +50,22 @@ class RenamifyApp(tk.Tk):
         self.lbl_new_name = tk.Label(self, text="New Prefix")
         self.lbl_new_name.grid(row=5, column=0, padx=10, pady=10)
 
-        ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
-        ent_new_name.grid(row=5, column=1, sticky="ew", padx=10, pady=0)
+        self.ent_new_name = tk.Entry(self, textvariable=self.var_new_name)
+        self.ent_new_name.grid(row=5, column=1, sticky="ew", padx=10, pady=0)
+        
+    
+        self.lbl_to_match = tk.Label(self, text="To Match")
+        self.ent_to_match = tk.Entry(self, textvariable=self.var_to_match)
 
+        # Empty row
+        self.grid_rowconfigure(2, minsize=20)
         # Rename button
         btn_rename = tk.Button(self, text="Rename Files", command=self.rename_files)
-        btn_rename.grid(row=6, columnspan=2, pady=20)
+        btn_rename.grid(row=7, columnspan=2, pady=10)
 
         # Checkbox for subfolders
         chk_include_subfolders = tk.Checkbutton(self, text="Include Subfolders", variable=self.var_include_subfolders)
-        chk_include_subfolders.grid(row=7, column=1, padx=10, sticky="e")
+        chk_include_subfolders.grid(row=8, column=1, padx=10, sticky="e")
 
         # Checkbox for if extensions should be replaced
         # Widget is hidden unless in "replace" / "suffix" mode
@@ -71,15 +79,31 @@ class RenamifyApp(tk.Tk):
             self.lbl_new_name.config(text="New Suffix:")
         elif mode == "replace":
             self.lbl_new_name.config(text="New Name:")
+        elif mode == "match":
+            self.lbl_new_name.config(text="New Value:")
+            
         
         self.show_hide_options(mode)
 
     def show_hide_options(self, mode):
         # Show / Hide the checkboxes if mode is "replace" / "suffix"
         if mode == "replace" or mode == "suffix":
-            self.chk_replace_extension.grid(row=8, column=1, padx=10, sticky="e")
+            self.chk_replace_extension.grid(row=9, column=1, padx=10, sticky="e")
         else:
             self.chk_replace_extension.grid_remove()
+
+        if mode == "match":
+            self.lbl_to_match.grid(row=5, column=0, padx=10, pady=0)
+            self.ent_to_match.grid(row=6, column=0, sticky="ew", padx=10, pady=0)
+            self.lbl_new_name.grid(row=5, column=1, padx=10, pady=0)
+            self.ent_new_name.grid(row=6, column=1, sticky="ew", padx=10, pady=0)
+        else:
+            self.lbl_new_name.grid(row=5, column=0, padx=10, pady=10)
+            self.ent_new_name.grid(row=5, column=1, sticky="ew", padx=10, pady=0)
+
+            self.lbl_to_match.grid_remove()
+            self.ent_to_match.grid_remove()
+
 
 
     def select_folder(self):
@@ -128,6 +152,8 @@ class RenamifyApp(tk.Tk):
             return self.add_suffix(old_filename, file_extension)
         elif var_mode == "replace":
             return self.replace_whole(file_extension, f" ({index})")
+        elif var_mode == "match":
+            return self.replace_match(old_filename, file_extension)
 
         return old_filename
     
@@ -142,8 +168,6 @@ class RenamifyApp(tk.Tk):
         else:
             return old_filename + self.var_new_name.get() + file_extension
 
-
-
     def replace_whole(self, file_extension, suffix=""):
         user_input = self.var_new_name.get()
         if self.var_replace_extension.get():
@@ -151,4 +175,7 @@ class RenamifyApp(tk.Tk):
             return new_name + str(suffix) + new_extension
         else:
             return user_input + str(suffix) + file_extension
+        
+    def replace_match(self, old_filename, file_extension):
+        return old_filename.replace(self.var_to_match.get(), self.var_new_name.get()) + file_extension
 
